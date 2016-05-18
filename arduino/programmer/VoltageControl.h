@@ -1,6 +1,8 @@
 #pragma once
 #include "arduino.h"
 
+extern volatile int risingReadyPinCount;
+
 enum class VppStatus {
   VppStatus_0V,
   VppStatus_5V,

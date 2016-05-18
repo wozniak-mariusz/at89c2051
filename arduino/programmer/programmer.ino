@@ -5,7 +5,7 @@
 #include "VoltageControl.h"
 
 const int MAX_COMMAND_LENGTH = 10;
-struct Program program; //must be global to see memory consumption (compiler warns about low memory when it's consumed in compilation time
+struct Program program; //must be global to see memory consumption (compiler warns about low memory when it's consumed in compilation time)
 
 class VoltageControl vc;
 
@@ -313,12 +313,19 @@ void writeCmd(Stream& stream, class Params& params, class Program& program) {
     vc.setData(program.data[i]);
   
     delay(1);
+
+    risingReadyPinCount = 0;
   
     vc.setProg(0);
     delayMicroseconds(30);
     vc.setProg(1);
 
-    delay(1);
+    while (risingReadyPinCount < 1) {
+      delayMicroseconds(10);
+    }
+
+    //delay(1);
+    delayMicroseconds(10);
 
     //pulse xtal
     vc.setXtal1(1);
@@ -329,6 +336,39 @@ void writeCmd(Stream& stream, class Params& params, class Program& program) {
   delay(5);
   vc.reset();
 }
+
+//void writeLockBit1(Stream& stream, class Params& params, class Program& program) {
+//  writeLockBitImpl(stream, true);
+//}
+//
+//void writeLockBit2(Stream& stream, class Params& params, class Program& program) {
+//  writeLockBitImpl(stream, true);
+//}
+//
+//void writeLockBitImpl(Stream& stream, bool bit1) {
+//  vc.reset();
+//
+//  vc.setVcc(1);
+//  delay(1);
+//  vc.setVpp(VppStatus::VppStatus_5V);
+//  vc.setProg(1);
+//  delay(1);
+//  vc.setMode(bit1 ? Mode::WriteLock_Bit1 : Mode::WriteLock_Bit2);
+//
+//  delay(1);
+//  vc.setVpp(VppStatus::VppStatus_12V);
+//  delay(1);
+//
+//  vc.setProg(0);
+//  delayMicroseconds(30);
+//  vc.setProg(1);
+//
+//  delay(5);
+//  vc.setVpp(VppStatus::VppStatus_5V);
+//  delay(1);
+//
+//  vc.reset();
+//}
 
 //====================================================================
 
@@ -341,6 +381,8 @@ CmdHandler handlers[] = {
   { "rp", readProgramCmd },
   { "er", eraseCmd },
   { "w", writeCmd },
+//  { "wlb1", writeLockBit1 },
+//  { "wlb2", writeLockBit2 },
 
   { "tsp", testSetPortCmd },
   { "trp", testResetPortsCmd },

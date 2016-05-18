@@ -22,6 +22,12 @@ const int DATA_PORT_7 = 9;
 
 const int RDY_PORT = 0; //RDY/!BSY
 
+volatile int risingReadyPinCount = 0;
+
+void risingReadyPinInterruptHandler(void) {
+  ++risingReadyPinCount;
+}
+
 VoltageControl::VoltageControl() {
 }
 
@@ -39,7 +45,9 @@ void VoltageControl::initPorts() {
 
   pinMode(RDY_PORT, INPUT_PULLUP);
 
-  //attachInterrupt(digitalPinToInterrupt(RDY_PORT), risingReadyPin, RISING);
+  attachInterrupt(digitalPinToInterrupt(RDY_PORT),
+                  risingReadyPinInterruptHandler,
+                  RISING);
 }
 
 void VoltageControl::setP1AsInput(const bool asInput) {
